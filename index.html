@@ -1,0 +1,1391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Computer Lab Management System</title>
+
+<style>
+*{box-sizing:border-box}
+
+body{
+margin:0;
+font-family:Arial,sans-serif;
+background:#f1f5f9;
+color:#1e293b
+}
+
+header{
+background:#2563eb;
+color:white;
+padding:20px;
+text-align:center
+}
+
+header h1{
+margin:0;
+font-size:22px
+}
+
+header p{
+margin:6px 0 0
+}
+
+.container{
+display:flex;
+min-height:calc(100vh - 85px)
+}
+
+.sidebar{
+width:220px;
+background:#1e293b;
+padding:12px
+}
+
+.sidebar button{
+width:100%;
+border:0;
+background:transparent;
+color:white;
+padding:14px;
+margin-bottom:6px;
+border-radius:8px;
+font-size:15px;
+text-align:left;
+cursor:pointer
+}
+
+.sidebar button.active{
+background:#2563eb
+}
+
+main{
+flex:1;
+padding:20px
+}
+
+.page{
+display:none
+}
+
+.page.active{
+display:block
+}
+
+h2{
+margin-top:0
+}
+
+.cards{
+display:grid;
+grid-template-columns:repeat(5,1fr);
+gap:12px;
+margin-bottom:20px
+}
+
+.card{
+background:white;
+padding:18px;
+border-radius:12px;
+box-shadow:0 2px 8px #0001
+}
+
+.card h3{
+margin:0;
+font-size:14px;
+color:#64748b
+}
+
+.number{
+font-size:30px;
+font-weight:bold;
+color:#2563eb;
+margin-top:8px
+}
+
+.panel{
+background:white;
+padding:20px;
+border-radius:12px;
+margin-bottom:20px;
+box-shadow:0 2px 8px #0001
+}
+
+.form{
+display:flex;
+gap:8px;
+flex-wrap:wrap
+}
+
+input,select{
+padding:11px;
+border:1px solid #cbd5e1;
+border-radius:7px;
+font-size:14px;
+min-width:140px;
+flex:1
+}
+
+.search{
+width:100%;
+margin-bottom:15px
+}
+
+.btn{
+border:0;
+border-radius:7px;
+padding:10px 14px;
+color:white;
+background:#2563eb;
+cursor:pointer
+}
+
+.green{
+background:#16a34a
+}
+
+.red{
+background:#dc2626
+}
+
+.orange{
+background:#ea580c
+}
+
+.table-box{
+overflow-x:auto
+}
+
+table{
+width:100%;
+border-collapse:collapse;
+min-width:600px
+}
+
+th,td{
+padding:11px;
+border-bottom:1px solid #e2e8f0;
+text-align:left
+}
+
+th{
+background:#f8fafc
+}
+
+.status{
+padding:5px 9px;
+border-radius:20px;
+font-size:12px;
+font-weight:bold
+}
+
+.available,.present{
+background:#dcfce7;
+color:#166534
+}
+
+.inuse{
+background:#dbeafe;
+color:#1e40af
+}
+
+.maintenance,.absent{
+background:#fee2e2;
+color:#991b1b
+}
+
+.late{
+background:#fef3c7;
+color:#92400e
+}
+
+@media(max-width:900px){
+.cards{
+grid-template-columns:repeat(2,1fr)
+}
+}
+
+@media(max-width:650px){
+
+.container{
+display:block
+}
+
+.sidebar{
+width:100%;
+display:flex;
+overflow-x:auto
+}
+
+.sidebar button{
+min-width:120px;
+text-align:center;
+margin:3px
+}
+
+main{
+padding:12px
+}
+
+.cards{
+grid-template-columns:1fr 1fr
+}
+}
+
+@media(max-width:400px){
+.cards{
+grid-template-columns:1fr
+}
+}
+</style>
+</head>
+
+<body>
+
+<header>
+<h1>COMPUTER LAB MANAGEMENT SYSTEM</h1>
+<p>School Computer Laboratory</p>
+</header>
+
+<div class="container">
+
+<div class="sidebar">
+
+<button class="active" onclick="page('dashboard',this)">
+🏠 Dashboard
+</button>
+
+<button onclick="page('students',this)">
+👨‍🎓 Students
+</button>
+
+<button onclick="page('attendance',this)">
+📋 Attendance
+</button>
+
+<button onclick="page('computers',this)">
+💻 Computers
+</button>
+
+<button onclick="page('inventory',this)">
+📦 Inventory
+</button>
+
+<button onclick="page('reports',this)">
+📊 Reports
+</button>
+
+</div>
+
+<main>
+
+<!-- DASHBOARD -->
+
+<section id="dashboard" class="page active">
+
+<h2>Dashboard</h2>
+
+<p>Computer laboratory overview</p>
+
+<div class="cards">
+
+<div class="card">
+<h3>Students</h3>
+<div class="number" id="studentCount">0</div>
+</div>
+
+<div class="card">
+<h3>Computers</h3>
+<div class="number" id="computerCount">0</div>
+</div>
+
+<div class="card">
+<h3>Available</h3>
+<div class="number" id="availableCount">0</div>
+</div>
+
+<div class="card">
+<h3>In Use</h3>
+<div class="number" id="inUseCount">0</div>
+</div>
+
+<div class="card">
+<h3>Maintenance</h3>
+<div class="number" id="maintenanceCount">0</div>
+</div>
+
+</div>
+
+<div class="panel">
+<h3>Welcome</h3>
+<p>
+Welcome to the Computer Lab Management System.
+Use the buttons on the left to manage your laboratory.
+</p>
+</div>
+
+</section>
+
+
+<!-- STUDENTS -->
+
+<section id="students" class="page">
+
+<h2>Students</h2>
+
+<div class="panel">
+
+<h3>Add Student</h3>
+
+<div class="form">
+
+<input id="studentName" placeholder="Student Name">
+
+<input id="studentSection" placeholder="Grade & Section">
+
+<button class="btn green" onclick="addStudent()">
++ Add Student
+</button>
+
+</div>
+
+</div>
+
+
+<div class="panel">
+
+<h3>Student List</h3>
+
+<input
+class="search"
+id="studentSearch"
+placeholder="Search student..."
+oninput="showStudents()"
+>
+
+<div class="table-box">
+
+<table>
+
+<thead>
+<tr>
+<th>#</th>
+<th>Name</th>
+<th>Grade & Section</th>
+<th>Actions</th>
+</tr>
+</thead>
+
+<tbody id="studentTable"></tbody>
+
+</table>
+
+</div>
+
+</div>
+
+</section>
+
+
+<!-- ATTENDANCE -->
+
+<section id="attendance" class="page">
+
+<h2>Attendance</h2>
+
+<div class="panel">
+
+<h3>Record Attendance</h3>
+
+<div class="form">
+
+<select id="attendanceStudent">
+<option value="">Select Student</option>
+</select>
+
+<select id="attendanceStatus">
+<option>Present</option>
+<option>Absent</option>
+<option>Late</option>
+</select>
+
+<button class="btn green" onclick="addAttendance()">
++ Record
+</button>
+
+</div>
+
+</div>
+
+
+<div class="panel">
+
+<h3>Attendance Records</h3>
+
+<div class="table-box">
+
+<table>
+
+<thead>
+<tr>
+<th>#</th>
+<th>Student</th>
+<th>Status</th>
+<th>Date</th>
+<th>Action</th>
+</tr>
+</thead>
+
+<tbody id="attendanceTable"></tbody>
+
+</table>
+
+</div>
+
+</div>
+
+</section>
+
+
+<!-- COMPUTERS -->
+
+<section id="computers" class="page">
+
+<h2>Computers</h2>
+
+<div class="panel">
+
+<h3>Add Computer</h3>
+
+<div class="form">
+
+<input
+id="computerName"
+placeholder="Computer Number / Name"
+>
+
+<select id="computerStatus">
+<option>Available</option>
+<option>In Use</option>
+<option>Maintenance</option>
+</select>
+
+<button class="btn green" onclick="addComputer()">
++ Add Computer
+</button>
+
+</div>
+
+</div>
+
+
+<div class="panel">
+
+<h3>Computer List</h3>
+
+<div class="table-box">
+
+<table>
+
+<thead>
+<tr>
+<th>#</th>
+<th>Computer</th>
+<th>Status</th>
+<th>Actions</th>
+</tr>
+</thead>
+
+<tbody id="computerTable"></tbody>
+
+</table>
+
+</div>
+
+</div>
+
+</section>
+
+
+<!-- INVENTORY -->
+
+<section id="inventory" class="page">
+
+<h2>Inventory</h2>
+
+<div class="panel">
+
+<h3>Add Inventory Item</h3>
+
+<div class="form">
+
+<input id="itemName" placeholder="Item Name">
+
+<input
+id="itemQuantity"
+type="number"
+min="1"
+placeholder="Quantity"
+>
+
+<button class="btn green" onclick="addItem()">
++ Add Item
+</button>
+
+</div>
+
+</div>
+
+
+<div class="panel">
+
+<h3>Inventory List</h3>
+
+<div class="table-box">
+
+<table>
+
+<thead>
+<tr>
+<th>#</th>
+<th>Item</th>
+<th>Quantity</th>
+<th>Actions</th>
+</tr>
+</thead>
+
+<tbody id="inventoryTable"></tbody>
+
+</table>
+
+</div>
+
+</div>
+
+</section>
+
+
+<!-- REPORTS -->
+
+<section id="reports" class="page">
+
+<h2>Reports</h2>
+
+<div class="panel">
+
+<h3>Laboratory Summary</h3>
+
+<p>
+Students:
+<strong id="reportStudents">0</strong>
+</p>
+
+<p>
+Computers:
+<strong id="reportComputers">0</strong>
+</p>
+
+<p>
+Available:
+<strong id="reportAvailable">0</strong>
+</p>
+
+<p>
+In Use:
+<strong id="reportInUse">0</strong>
+</p>
+
+<p>
+Maintenance:
+<strong id="reportMaintenance">0</strong>
+</p>
+
+<br>
+
+<button class="btn" onclick="window.print()">
+🖨 Print Report
+</button>
+
+<button class="btn red" onclick="clearData()">
+🗑 Clear All Data
+</button>
+
+</div>
+
+</section>
+
+</main>
+</div>
+
+
+<script>
+
+/* DATA */
+
+var students =
+JSON.parse(localStorage.getItem("students") || "[]");
+
+var attendance =
+JSON.parse(localStorage.getItem("attendance") || "[]");
+
+var computers =
+JSON.parse(localStorage.getItem("computers") || "[]");
+
+var inventory =
+JSON.parse(localStorage.getItem("inventory") || "[]");
+
+
+/* SAVE */
+
+function save(){
+
+localStorage.setItem(
+"students",
+JSON.stringify(students)
+);
+
+localStorage.setItem(
+"attendance",
+JSON.stringify(attendance)
+);
+
+localStorage.setItem(
+"computers",
+JSON.stringify(computers)
+);
+
+localStorage.setItem(
+"inventory",
+JSON.stringify(inventory)
+);
+
+}
+
+
+/* PAGE NAVIGATION */
+
+function page(id,button){
+
+var pages =
+document.querySelectorAll(".page");
+
+var buttons =
+document.querySelectorAll(".sidebar button");
+
+var i;
+
+for(i=0;i<pages.length;i++){
+pages[i].classList.remove("active");
+}
+
+for(i=0;i<buttons.length;i++){
+buttons[i].classList.remove("active");
+}
+
+document.getElementById(id).classList.add("active");
+
+button.classList.add("active");
+
+showStudents();
+showAttendance();
+showComputers();
+showInventory();
+updateDashboard();
+
+}
+
+
+/* STUDENTS */
+
+function addStudent(){
+
+var name =
+document.getElementById("studentName").value.trim();
+
+var section =
+document.getElementById("studentSection").value.trim();
+
+if(name===""){
+alert("Enter student name.");
+return;
+}
+
+if(section===""){
+alert("Enter grade and section.");
+return;
+}
+
+students.push({
+id:Date.now(),
+name:name,
+section:section
+});
+
+document.getElementById("studentName").value="";
+document.getElementById("studentSection").value="";
+
+save();
+
+showStudents();
+
+updateDashboard();
+
+alert("Student added!");
+
+}
+
+
+function showStudents(){
+
+var table =
+document.getElementById("studentTable");
+
+var search =
+document.getElementById("studentSearch").value.toLowerCase();
+
+table.innerHTML="";
+
+var number=1;
+
+var i;
+
+for(i=0;i<students.length;i++){
+
+var s=students[i];
+
+if(
+s.name.toLowerCase().indexOf(search)===-1 &&
+s.section.toLowerCase().indexOf(search)===-1
+){
+continue;
+}
+
+table.innerHTML +=
+"<tr>" +
+"<td>"+number+"</td>" +
+"<td>"+s.name+"</td>" +
+"<td>"+s.section+"</td>" +
+"<td>" +
+"<button class='btn orange' onclick='editStudent("+s.id+")'>Edit</button> " +
+"<button class='btn red' onclick='deleteStudent("+s.id+")'>Delete</button>" +
+"</td>" +
+"</tr>";
+
+number++;
+
+}
+
+updateStudentSelect();
+
+}
+
+
+function editStudent(id){
+
+var i;
+
+for(i=0;i<students.length;i++){
+
+if(students[i].id===id){
+
+var name =
+prompt("Student Name:",students[i].name);
+
+if(name===null){
+return;
+}
+
+var section =
+prompt(
+"Grade & Section:",
+students[i].section
+);
+
+if(section===null){
+return;
+}
+
+if(name.trim()==="" || section.trim()===""){
+alert("Cannot be empty.");
+return;
+}
+
+students[i].name=name.trim();
+students[i].section=section.trim();
+
+save();
+
+showStudents();
+
+alert("Student updated!");
+
+return;
+
+}
+
+}
+
+}
+
+
+function deleteStudent(id){
+
+if(!confirm("Delete this student?")){
+return;
+}
+
+var newList=[];
+
+var i;
+
+for(i=0;i<students.length;i++){
+
+if(students[i].id!==id){
+newList.push(students[i]);
+}
+
+}
+
+students=newList;
+
+save();
+
+showStudents();
+
+updateDashboard();
+
+}
+
+
+/* ATTENDANCE */
+
+function updateStudentSelect(){
+
+var select =
+document.getElementById("attendanceStudent");
+
+select.innerHTML =
+"<option value=''>Select Student</option>";
+
+var i;
+
+for(i=0;i<students.length;i++){
+
+select.innerHTML +=
+"<option value='"+students[i].id+"'>" +
+students[i].name +
+"</option>";
+
+}
+
+}
+
+
+function addAttendance(){
+
+var id =
+document.getElementById("attendanceStudent").value;
+
+var status =
+document.getElementById("attendanceStatus").value;
+
+if(id===""){
+alert("Select a student.");
+return;
+}
+
+var i;
+
+for(i=0;i<students.length;i++){
+
+if(students[i].id==id){
+
+attendance.push({
+
+id:Date.now(),
+
+studentId:students[i].id,
+
+studentName:students[i].name,
+
+status:status,
+
+date:new Date().toLocaleDateString()
+
+});
+
+save();
+
+showAttendance();
+
+alert("Attendance recorded!");
+
+return;
+
+}
+
+}
+
+}
+
+
+function showAttendance(){
+
+var table =
+document.getElementById("attendanceTable");
+
+table.innerHTML="";
+
+var i;
+
+for(i=0;i<attendance.length;i++){
+
+var a=attendance[i];
+
+table.innerHTML +=
+"<tr>" +
+"<td>"+(i+1)+"</td>" +
+"<td>"+a.studentName+"</td>" +
+"<td><span class='status "+a.status.toLowerCase()+"'>"+a.status+"</span></td>" +
+"<td>"+a.date+"</td>" +
+"<td><button class='btn red' onclick='deleteAttendance("+a.id+")'>Delete</button></td>" +
+"</tr>";
+
+}
+
+}
+
+
+function deleteAttendance(id){
+
+if(!confirm("Delete attendance record?")){
+return;
+}
+
+var list=[];
+
+var i;
+
+for(i=0;i<attendance.length;i++){
+
+if(attendance[i].id!==id){
+list.push(attendance[i]);
+}
+
+}
+
+attendance=list;
+
+save();
+
+showAttendance();
+
+}
+
+
+/* COMPUTERS */
+
+function addComputer(){
+
+var name =
+document.getElementById("computerName").value.trim();
+
+var status =
+document.getElementById("computerStatus").value;
+
+if(name===""){
+alert("Enter computer name.");
+return;
+}
+
+computers.push({
+id:Date.now(),
+name:name,
+status:status
+});
+
+document.getElementById("computerName").value="";
+
+save();
+
+showComputers();
+
+updateDashboard();
+
+alert("Computer added!");
+
+}
+
+
+function showComputers(){
+
+var table =
+document.getElementById("computerTable");
+
+table.innerHTML="";
+
+var i;
+
+for(i=0;i<computers.length;i++){
+
+var c=computers[i];
+
+var cls="";
+
+if(c.status==="Available"){
+cls="available";
+}
+
+if(c.status==="In Use"){
+cls="inuse";
+}
+
+if(c.status==="Maintenance"){
+cls="maintenance";
+}
+
+table.innerHTML +=
+"<tr>" +
+"<td>"+(i+1)+"</td>" +
+"<td>"+c.name+"</td>" +
+"<td><span class='status "+cls+"'>"+c.status+"</span></td>" +
+"<td>" +
+"<button class='btn orange' onclick='editComputer("+c.id+")'>Edit</button> " +
+"<button class='btn red' onclick='deleteComputer("+c.id+")'>Delete</button>" +
+"</td>" +
+"</tr>";
+
+}
+
+}
+
+
+function editComputer(id){
+
+var i;
+
+for(i=0;i<computers.length;i++){
+
+if(computers[i].id===id){
+
+var name =
+prompt(
+"Computer Name:",
+computers[i].name
+);
+
+if(name===null){
+return;
+}
+
+var status =
+prompt(
+"Type: Available, In Use, or Maintenance",
+computers[i].status
+);
+
+if(status===null){
+return;
+}
+
+status=status.trim().toLowerCase();
+
+if(status==="available"){
+computers[i].status="Available";
+}
+else if(status==="in use"){
+computers[i].status="In Use";
+}
+else if(status==="maintenance"){
+computers[i].status="Maintenance";
+}
+else{
+alert("Invalid status.");
+return;
+}
+
+if(name.trim()===""){
+alert("Computer name cannot be empty.");
+return;
+}
+
+computers[i].name=name.trim();
+
+save();
+
+showComputers();
+
+updateDashboard();
+
+return;
+
+}
+
+}
+
+}
+
+
+function deleteComputer(id){
+
+if(!confirm("Delete this computer?")){
+return;
+}
+
+var list=[];
+
+var i;
+
+for(i=0;i<computers.length;i++){
+
+if(computers[i].id!==id){
+list.push(computers[i]);
+}
+
+}
+
+computers=list;
+
+save();
+
+showComputers();
+
+updateDashboard();
+
+}
+
+
+/* INVENTORY */
+
+function addItem(){
+
+var name =
+document.getElementById("itemName").value.trim();
+
+var quantity =
+Number(document.getElementById("itemQuantity").value);
+
+if(name===""){
+alert("Enter item name.");
+return;
+}
+
+if(quantity<1 || isNaN(quantity)){
+alert("Enter a valid quantity.");
+return;
+}
+
+inventory.push({
+id:Date.now(),
+name:name,
+quantity:quantity
+});
+
+document.getElementById("itemName").value="";
+document.getElementById("itemQuantity").value="";
+
+save();
+
+showInventory();
+
+alert("Item added!");
+
+}
+
+
+function showInventory(){
+
+var table =
+document.getElementById("inventoryTable");
+
+table.innerHTML="";
+
+var i;
+
+for(i=0;i<inventory.length;i++){
+
+var item=inventory[i];
+
+table.innerHTML +=
+"<tr>" +
+"<td>"+(i+1)+"</td>" +
+"<td>"+item.name+"</td>" +
+"<td>"+item.quantity+"</td>" +
+"<td>" +
+"<button class='btn orange' onclick='editItem("+item.id+")'>Edit</button> " +
+"<button class='btn red' onclick='deleteItem("+item.id+")'>Delete</button>" +
+"</td>" +
+"</tr>";
+
+}
+
+}
+
+
+function editItem(id){
+
+var i;
+
+for(i=0;i<inventory.length;i++){
+
+if(inventory[i].id===id){
+
+var name =
+prompt(
+"Item Name:",
+inventory[i].name
+);
+
+if(name===null){
+return;
+}
+
+var quantity =
+prompt(
+"Quantity:",
+inventory[i].quantity
+);
+
+if(quantity===null){
+return;
+}
+
+if(
+name.trim()==="" ||
+Number(quantity)<1
+){
+alert("Invalid information.");
+return;
+}
+
+inventory[i].name=name.trim();
+inventory[i].quantity=Number(quantity);
+
+save();
+
+showInventory();
+
+return;
+
+}
+
+}
+
+}
+
+
+function deleteItem(id){
+
+if(!confirm("Delete this item?")){
+return;
+}
+
+var list=[];
+
+var i;
+
+for(i=0;i<inventory.length;i++){
+
+if(inventory[i].id!==id){
+list.push(inventory[i]);
+}
+
+}
+
+inventory=list;
+
+save();
+
+showInventory();
+
+}
+
+
+/* DASHBOARD */
+
+function updateDashboard(){
+
+var available=0;
+var inUse=0;
+var maintenance=0;
+
+var i;
+
+for(i=0;i<computers.length;i++){
+
+if(computers[i].status==="Available"){
+available++;
+}
+
+if(computers[i].status==="In Use"){
+inUse++;
+}
+
+if(computers[i].status==="Maintenance"){
+maintenance++;
+}
+
+}
+
+document.getElementById("studentCount").textContent=students.length;
+
+document.getElementById("computerCount").textContent=computers.length;
+
+document.getElementById("availableCount").textContent=available;
+
+document.getElementById("inUseCount").textContent=inUse;
+
+document.getElementById("maintenanceCount").textContent=maintenance;
+
+document.getElementById("reportStudents").textContent=students.length;
+
+document.getElementById("reportComputers").textContent=computers.length;
+
+document.getElementById("reportAvailable").textContent=available;
+
+document.getElementById("reportInUse").textContent=inUse;
+
+document.getElementById("reportMaintenance").textContent=maintenance;
+
+}
+
+
+/* CLEAR DATA */
+
+function clearData(){
+
+if(!confirm("Delete ALL system data?")){
+return;
+}
+
+students=[];
+attendance=[];
+computers=[];
+inventory=[];
+
+save();
+
+showStudents();
+showAttendance();
+showComputers();
+showInventory();
+updateDashboard();
+
+alert("All data deleted.");
+
+}
+
+
+/* START */
+
+showStudents();
+showAttendance();
+showComputers();
+showInventory();
+updateDashboard();
+
+</script>
+
+</body>
+  </html>
+  
